@@ -19,7 +19,7 @@ describe('Index Page', () => {
     const ACTUAL_CLASSNAMES = getByTestId('main-heading-h1').className
 
     // Then
-    expect(1).toBe(1)
+    expect(1).toBe(2)
     expect(ACTUAL).toEqual('Hello World')
     expect(ACTUAL_CLASSNAMES).toBe('text-xl text-gray-900')
   })
