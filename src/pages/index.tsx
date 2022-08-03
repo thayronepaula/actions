@@ -7,7 +7,7 @@ import MainHeading from '@src/components/main-heading/main-heading'
 const Home: NextPage = () => {
   return (
     <MainHeading>
-      Hello from <u>{publicRuntimeConfig.APP_NAME}</u>.
+      Hello world vfhyjuse<u>{publicRuntimeConfig.APP_NAME}</u>.
     </MainHeading>
   )
 }
