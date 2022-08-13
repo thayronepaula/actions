@@ -23,4 +23,4 @@ jobs:
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: npm install
       - name: jest
-        run: ./scripts/setupTestMatrix.sh ${{ matrix.chunk }} 10
+        run:  sh ./scripts/setupTestMatrix.sh ${{ matrix.chunk }} 10
