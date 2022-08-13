@@ -3,20 +3,35 @@ name: Node.js CI
 on: ['push', 'pull_request']
 
 jobs:
-  tests:
-    name: Rodar testes unitários
+  setup-test-chunks:
     runs-on: ubuntu-latest
+    outputs:
+      chunks: ${{ steps ['set-chunks'].outputs ['chunks'] }}
+      chunk-ids: ${{ steps ['set-chunk-ids'].outputs ['chunk-ids'] }}
+  steps:
+    # Your actions are described here...
 
+    - name: Set Chunks
+      id: set-chunks
+      run: echo "::set-output name=chunks::$(npx jest list Tests --json | jq -cM '[_nwise (length / 10 ceil)]')"
+
+    - name: Set Chunk IDs
+      id: set-chunk-ids
+      run: echo "::set-output name=chunk-ids::$(echo $CHUNKS | jq -cM 'to_entries | map(.key)')"
+      env:
+        CHUNKS: ${{ steps.set-chunks.outputs.chunks }}
+
+  tests-check:
+    needs: setup-test-chunks
+    runs-on: ubuntu-latest
+    name: test-chunk-${{ matrix.chunk}}
     strategy:
+      fail-fast: false
       matrix:
-        node-version: [16.x]
-
+      chunk: ${{fromJson (needs ['setup-test-chunks'].outputs ['chunk-ids']) }}
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    - run: npm test
+      # Your actions are described here...
+      - name: Run chunks
+    run: echo $CHUNKS | jq '.[${{ matrix.chunk }}] | .[] || @text' | xargs npm run test
+    env:
+      CHUNKS: ${{needs ['setup-test-chunks'].outputs ['chunks'] }}

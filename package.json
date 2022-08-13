@@ -8,7 +8,7 @@
     "test:coverage": "yarn-or-npm test --coverage",
     "test:debug": "yarn-or-npm test --debug --detectOpenHandles",
     "test:ci": "yarn-or-npm test --runInBand --no-cache --ci",
-    "test": "NODE_ENV=test jest",
+    "test": "jest --listTests --json | jq -cM '[_nwise(length / 10 | ceil)]",
     "lint": "eslint './{src,pages}/**/*' --ext .js,.jsx,.tsx,.ts",
     "format": "eslint './{src,pages}/**/*' --ext .js,.jsx,.tsx,.ts --fix",
     "typecheck": "tsc --noEmit",
