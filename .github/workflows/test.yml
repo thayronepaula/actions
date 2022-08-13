@@ -3,52 +3,24 @@ name: Node.js CI
   - pull_request
   
 jobs:
-  setup:
+  tests:
+    name: Rodar testes unitários
     runs-on: ubuntu-latest
-    outputs:
-      test-chunks: '${{ steps[''set-test-chunks''].outputs[''test-chunks''] }}'
-      test-chunk-ids: '${{ steps[''set-test-chunk-ids''].outputs[''test-chunk-ids''] }}'
-    steps:
-      - name: Instalar o Node.js
-        uses: actions/setup-node@v1
-        with:
-          node-version: 12.x
-      - name: Cacheando dependencias
-        id: cache_dependencies
-        uses: actions/cache@v2
-        with:
-          path: node_modules
-          key: >-
-            ${{ runner.os }}-dependencies-${{ hashFiles('./package-lock.json')
-            }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-      - id: set-test-chunks
-        name: Set Chunks
-        run: >-
-          echo "::set-output name=test-chunks::$(npx jest --listTests --json |
-          jq -cM '[_nwise(length / 2 | ceil)]')"
-      - id: set-test-chunk-ids
-        name: Set Chunk IDs
-        run: >-
-          echo "::set-output name=test-chunk-ids::$(echo $CHUNKS | jq -cM
-          'to_entries | map(.key)')"
-        env:
-          CHUNKS: '${{ steps[''set-test-chunks''].outputs[''test-chunks''] }}'
-  test:
-    runs-on: ubuntu-latest
-    name: 'test (chunk ${{ matrix.chunk }})'
-    needs:
-      - setup
+
     strategy:
-      matrix:
-        chunk: '${{ fromJson(needs.setup.outputs[''test-chunk-ids'']) }}'
+       matrix:
+        chunk: [1,2,3,4,5,6,7,8,9,10]
+
     steps:
       - uses: actions/checkout@v2
-      - run: npm install
+      - uses: actions/setup-node@v1
+      - uses: actions/cache@v2
+        id: npm-cache
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+      - name: Install npm
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: npm install
       - name: jest
-        run: >-
-          echo $CHUNKS | jq '.[${{ matrix.chunk }}] | .[] | @text' | xargs npx
-          jest
-        env:
-          CHUNKS: '${{ needs.setup.outputs[''test-chunks''] }}'
+        run: ./scripts/setupTestMatrix.sh ${{ matrix.chunk }} 10
