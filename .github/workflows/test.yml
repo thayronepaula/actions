@@ -1,7 +1,5 @@
 name: Testes unitários
 'on':
-  paths:
-    - src/**
   pull_request:
     branches:
       - master
