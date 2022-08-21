@@ -1,26 +1,32 @@
-name: Node.js CI
-'on':
-  - pull_request
-  
+name: Testes unitários
+
+on: ['push', 'pull_request']
+
 jobs:
   tests:
     name: Rodar testes unitários
     runs-on: ubuntu-latest
 
-    strategy:
-       matrix:
-        chunk: [1,2,3,4,5,6,7,8,9,10]
-
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-      - uses: actions/cache@v2
-        id: npm-cache
+      - name: Puxar o código do commit
+        uses: actions/checkout@v2
+
+      - name: Instalar o Node.js
+        uses: actions/setup-node@v1
         with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-      - name: Install npm
-        if: steps.npm-cache.outputs.cache-hit != 'true'
-        run: npm install
-      - name: jest
-        run:  sh ./scripts/setupTestMatrix.sh ${{ matrix.chunk }} 10
+          node-version: '12.x'
+
+      - name: Cacheando dependencias
+        id: cache_dependencies
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-dependencies-${{ hashFiles('./package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Instalar as dependências do npm
+        if: steps.cache_dependencies.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Rodar testes
+        run: npm test
