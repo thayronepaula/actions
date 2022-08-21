@@ -23,6 +23,7 @@ describe('Index Page', () => {
     // Then
     expect(1).toBe(1)
     expect(10).toBe(10)
+    expect(10).toBe(9)
     expect(ACTUAL).toEqual('Hello World')
     expect(ACTUAL_CLASSNAMES).toBe('text-xl text-gray-900')
   })
