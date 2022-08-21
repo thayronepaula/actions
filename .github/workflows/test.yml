@@ -1,41 +1,38 @@
 name: Testes unitários
-
-on:
+'on':
   paths:
-    pull_request:
-     paths:
-      - 'src/**'
-      branches: [ master, homologation ]
-    push:
-      paths:
-        - 'src/**'
-        branches: [ master, homologation ]
-      
+    - src/**
+  pull_request:
+    branches:
+      - master
+      - homologation
+  push:
+    branches:
+      - master
+      - homologation
 jobs:
   tests:
     name: Rodar testes unitários
     runs-on: ubuntu-latest
-
     steps:
       - name: Puxar o código do commit
         uses: actions/checkout@v2
-
       - name: Instalar o Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: '12.x'
-
+          node-version: 12.x
       - name: Cacheando dependencias
         id: cache_dependencies
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-dependencies-${{ hashFiles('./package-lock.json') }}
+          key: >-
+            ${{ runner.os }}-dependencies-${{ hashFiles('./package-lock.json')
+            }}
           restore-keys: |
             ${{ runner.os }}-node-
       - name: Instalar as dependências do npm
         if: steps.cache_dependencies.outputs.cache-hit != 'true'
         run: npm ci --ignore-scripts
-
       - name: Rodar testes
         run: npm test
