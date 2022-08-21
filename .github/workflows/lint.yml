@@ -1,4 +1,4 @@
-name: Testes unitários
+name: Eslint
 'on':
   pull_request:
     branches:
@@ -10,7 +10,7 @@ name: Testes unitários
       - homologation
 jobs:
   tests:
-    name: Rodar testes unitários
+    name: Rodar eslint
     runs-on: ubuntu-latest
     steps:
       - name: Puxar o código do commit
@@ -36,5 +36,5 @@ jobs:
         if: steps.cache_dependencies.outputs.cache-hit != 'true'
         run: npm ci --ignore-scripts
 
-      - name: Rodar testes
-        run: npm run test:ci
+      - name: Rodar lint
+        run: npm run lint
